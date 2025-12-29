@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>DUNCAGE</title>
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="Source/Duncage_icon.png">
+
+  <style>
+    body {
+      margin: 0;
+      background-color: #222;
+      display: flex;
+      justify-content: center;
+      padding-top: 0px;
+    }
+
+    #container {
+      position: absolute;
+      background-image: url("Source/DUNCAGE_ST.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: 1280px;
+      height: 715px;
+      z-index: 1;
+    }
+
+    .hp-box,
+    .maxhp-box {
+      position: absolute;
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      font-weight: 900;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .maxhp-box {
+      width: 60px;
+      height: 45px;
+      font-size: 22px;
+      cursor: default;
+      text-shadow: 0px 0px 5px black;
+    }
+
+    .hp-box {
+      width: 60px;
+      height: 48px;
+      font-size: 65px;
+      cursor: pointer;
+      -webkit-text-stroke: 1px rgba(255, 120, 120, 0.9);
+      text-shadow:
+        0 0 3px rgba(0, 0, 0, 0.9),
+        0 0 5px rgba(255, 120, 120, 0.9);
+    }
+
+    .item-box {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      font-weight: 900;
+      font-size: 46px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      cursor: pointer;
+      z-index: 10;
+      text-shadow: 0px 0px 5px black;
+    }
+
+    .item-box[data-item="gold"] {
+      -webkit-text-stroke: 1px #c89b2b;
+      text-shadow:
+        0 0 3px rgba(0, 0, 0, 0.9),
+        0 0 6px rgba(255, 215, 106, 0.8);
+    }
+
+    .item-box[data-item="key"] {
+      -webkit-text-stroke: 1px #ccc;
+      text-shadow:
+        0 0 3px rgba(0, 0, 0, 0.9),
+        0 0 6px rgba(255, 255, 255, 0.7);
+    }
+
+    /* ARMOR SOKETLERI */
+    .armor-socket {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      z-index: 12;
+      box-shadow: 0 0 4px rgba(0,0,0,0.7);
+    }
+
+    /* WEAPON SOKETLERI (SWORD) - TAMAMEN GÖRÜNMEZ */
+    .weapon-socket {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 12;
+      box-shadow: none;
+    }
+
+    /* ATTACK GÜCÜ GÖSTERGESI */
+    .attack-box {
+      position: absolute;
+      width: 80px;
+      height: 45px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: 900;
+      font-size: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      z-index: 13;
+      text-shadow: 0 0 5px black;
+      pointer-events: none;
+      transition: transform 0.15s ease-out;
+    }
+
+    /* +6 ATTACK ÖZEL EFEKTİ */
+    @keyframes attack-max-pulse {
+      0% {
+        transform: scale(1);
+        text-shadow:
+          0 0 4px rgba(255, 255, 255, 0.8),
+          0 0 8px rgba(255, 220, 120, 0.9),
+          0 0 14px rgba(255, 160, 80, 1);
+        color: #ffe9a0;
+      }
+      50% {
+        transform: scale(1.18);
+        text-shadow:
+          0 0 6px rgba(255, 255, 255, 1),
+          0 0 14px rgba(255, 240, 180, 1),
+          0 0 24px rgba(255, 200, 120, 1);
+        color: #fff5d0;
+      }
+      100% {
+        transform: scale(1);
+        text-shadow:
+          0 0 4px rgba(255, 255, 255, 0.8),
+          0 0 8px rgba(255, 220, 120, 0.9),
+          0 0 14px rgba(255, 160, 80, 1);
+        color: #ffe9a0;
+      }
+    }
+
+    .attack-max {
+      animation: attack-max-pulse 0.7s infinite;
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.9);
+    }
+
+    /* HP RESET (KAMP ATEŞI) BUTONLARI */
+    .hp-reset {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      background-image: url("Source/CampFire.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      z-index: 11;
+      filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+      transition: transform 0.1s ease-out;
+    }
+
+    .hp-reset:hover {
+      transform: scale(1.08);
+    }
+
+    /* BOSS HP BOX */
+    .boss-hp-box {
+      position: absolute;
+      width: 160px;
+      height: 90px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: 900;
+      font-size: 76px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      cursor: pointer;
+      z-index: 10;
+      text-shadow: 0 0 5px black;
+    }
+
+    .boss-hp-box.boss-dead {
+      font-size: 53px;
+    }
+
+    .boss-hp-box.boss-dead[data-boss="kayolith"] {
+      color: #7fd4ff;
+      -webkit-text-stroke: 2px #7fd4ff;
+      text-shadow: 0 0 10px #7fd4ff;
+    }
+
+    .boss-hp-box.boss-dead[data-boss="empress"] {
+      color: #d38bff;
+      -webkit-text-stroke: 2px #d38bff;
+      text-shadow: 0 0 10px #d38bff;
+    }
+
+    .boss-hp-box.boss-dead[data-boss="karvich"] {
+      color: #d45c6a;
+      -webkit-text-stroke: 2px #d45c6a;
+      text-shadow: 0 0 10px #d45c6a;
+    }
+
+    .boss-hp-box.boss-dead[data-boss="master"] {
+      color: #f2b6c8;
+      -webkit-text-stroke: 2px #f2b6c8;
+      text-shadow: 0 0 10px #f2b6c8;
+    }
+
+    .boss-hp-box.boss-dead[data-boss="flavek"] {
+      color: white;
+      -webkit-text-stroke: 2px white;
+      text-shadow: 0 0 12px white;
+    }
+
+    /* BOSS RESET BUTONLARI */
+    .boss-reset {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      background-image: url("Source/BossReset.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      z-index: 11;
+      filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+      transition: transform 0.1s ease-out;
+    }
+
+    .boss-reset:hover {
+      transform: scale(1.08);
+    }
+
+    /* MASTER RITUAL BUTONU (%25 BÜYÜTÜLMÜŞ) */
+    .master-ritual {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      background-image: url("Source/MasterRitual.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      z-index: 11;
+      filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 18px;
+      text-shadow: 0 0 4px black;
+      user-select: none;
+    }
+
+	.master-ritual:hover {
+      transform: scale(1.08);
+    }
+
+    @keyframes ritual-skull-pulse {
+      0% {
+        transform: scale(1);
+        filter:
+          drop-shadow(0 0 3px rgba(255, 255, 255, 0.9))
+          drop-shadow(0 0 6px rgba(200, 80, 255, 0.8));
+      }
+      50% {
+        transform: scale(1.12);
+        filter:
+          drop-shadow(0 0 6px rgba(255, 255, 255, 1))
+          drop-shadow(0 0 14px rgba(255, 120, 255, 1));
+      }
+      100% {
+        transform: scale(1);
+        filter:
+          drop-shadow(0 0 3px rgba(255, 255, 255, 0.9))
+          drop-shadow(0 0 6px rgba(200, 80, 255, 0.8));
+      }
+    }
+
+    .master-ritual-skull {
+      animation: ritual-skull-pulse 0.8s infinite;
+      color: #ffeefe;
+    }
+
+    /* OBERON (PET) HP BOX */
+    .pet-hp-box {
+      position: absolute;
+      width: 120px;
+      height: 70px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-weight: 900;
+      font-size: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      cursor: pointer;
+      z-index: 10;
+      text-shadow: 0 0 5px black;
+    }
+
+    .pet-hp-box.pet-dead {
+      font-size: 42px;
+    }
+
+    /* OBERON RESET BUTONU */
+    .pet-reset {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      background-image: url("Source/BossReset.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      z-index: 11;
+      filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+      transition: transform 0.1s ease-out;
+    }
+
+    .pet-reset:hover {
+      transform: scale(1.08);
+    }
+
+    /* BUMP (tüm sayılar) */
+    @keyframes hp-bump {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .hp-box.bump,
+    .maxhp-box.bump,
+    .item-box.bump,
+    .boss-hp-box.bump,
+    .pet-hp-box.bump,
+    .master-ritual.bump {
+      animation: hp-bump 0.18s ease-out;
+    }
+
+    /* LOW HP DANGER */
+    @keyframes hp-danger-jitter {
+      0% {
+        text-shadow:
+          0 0 3px rgba(0,0,0,0.9),
+          0 0 6px rgba(255, 40, 40, 0.7);
+      }
+      25% {
+        text-shadow:
+          -1px 0 3px rgba(0,0,0,0.9),
+          0 0 11px rgba(255, 0, 0, 1);
+      }
+      50% {
+        text-shadow:
+          1px -1px 3px rgba(0,0,0,0.9),
+          0 0 13px rgba(255, 0, 0, 1);
+      }
+      75% {
+        text-shadow:
+          0 1px 3px rgba(0,0,0,0.9),
+          0 0 9px rgba(255, 40, 40, 0.8);
+      }
+      100% {
+        text-shadow:
+          0 0 3px rgba(0,0,0,0.9),
+          0 0 6px rgba(255, 40, 40, 0.7);
+      }
+    }
+
+    .hp-box.hp-danger,
+    .pet-hp-box.hp-danger,
+    .boss-hp-box.hp-danger {
+      -webkit-text-stroke: 1px rgba(255, 80, 80, 0.95);
+      animation: hp-danger-jitter 0.35s infinite;
+    }
+
+    /* ARMOR FLAME (kare glow) */
+    @keyframes armor-flame-flicker {
+      0%   { box-shadow: 0 0 4px rgba(255,120,0,0.6); }
+      50%  { box-shadow: 0 0 14px rgba(255,200,80,1); }
+      100% { box-shadow: 0 0 4px rgba(255,120,0,0.6); }
+    }
+
+    .armor-flame {
+      animation: armor-flame-flicker 0.6s infinite alternate;
+    }
+
+    /* WEAPON FLAME (PNG şekline göre glow - drop-shadow) */
+    @keyframes weapon-flame-flicker {
+      0% {
+        filter:
+          drop-shadow(0 0 2px rgba(255, 200, 80, 0.7))
+          drop-shadow(0 0 4px rgba(255, 150, 0, 0.9));
+      }
+      50% {
+        filter:
+          drop-shadow(0 0 4px rgba(255, 230, 120, 0.9))
+          drop-shadow(0 0 10px rgba(255, 200, 80, 1));
+      }
+      100% {
+        filter:
+          drop-shadow(0 0 2px rgba(255, 200, 80, 0.7))
+          drop-shadow(0 0 4px rgba(255, 150, 0, 0.9));
+      }
+    }
+
+    .weapon-flame {
+      animation: weapon-flame-flicker 0.6s infinite alternate;
+    }
+
+    /* ITEM AURALARI */
+    @keyframes item-aura-pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    .gold-aura {
+      animation: item-aura-pulse 1.1s infinite;
+      -webkit-text-stroke: 1px #ffd35a;
+      text-shadow:
+        0 0 3px rgba(0,0,0,0.9),
+        0 0 4px rgba(255,215,0,0.5),
+        0 0 10px rgba(255,255,140,0.9);
+    }
+
+    .potion-aura {
+      animation: item-aura-pulse 0.9s infinite;
+      -webkit-text-stroke: 1px #ff4b4b;
+      text-shadow:
+        0 0 3px rgba(0,0,0,0.9),
+        0 0 5px rgba(255, 80, 80, 0.6),
+        0 0 11px rgba(255, 0, 0, 0.9);
+    }
+
+    .rune-aura {
+      animation: item-aura-pulse 1.0s infinite;
+      -webkit-text-stroke: 1px #d8a8ff;
+      text-shadow:
+        0 0 3px rgba(0,0,0,0.9),
+        0 0 5px rgba(216,168,255,0.7),
+        0 0 11px rgba(190,120,255,1);
+    }
+
+    .key-aura {
+      animation: item-aura-pulse 1.0s infinite;
+      -webkit-text-stroke: 1px #ffffff;
+      text-shadow:
+        0 0 3px rgba(0,0,0,0.9),
+        0 0 5px rgba(220,220,255,0.8),
+        0 0 12px rgba(255,255,255,1);
+    }
+
+    /* DRAG ICONLAR (sürüklenen pngler) */
+    .drag-icon {
+      position: absolute;
+      cursor: grab;
+      z-index: 20;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .drag-icon.dragging {
+      cursor: grabbing;
+    }
+
+    /* POPUP KARTLAR (1-5 ve Q W E tuşları) */
+    .card-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      display: none;
+    }
+
+    .card-popup img {
+      display: block;
+      max-width: none;
+      height: auto;
+      animation: card-pulse 5s infinite;
+    }
+
+    /* Kart çerçeve ve pulse efekt - daha küçük oran */
+    @keyframes card-pulse {
+      0% {
+        transform: scale(0.75);
+        filter:
+          drop-shadow(0 0 4px rgba(255, 255, 255, 0.7))
+          drop-shadow(0 0 10px rgba(160, 120, 255, 0.8));
+      }
+      50% {
+        transform: scale(0.78);
+        filter:
+          drop-shadow(0 0 8px rgba(255, 255, 255, 1))
+          drop-shadow(0 0 20px rgba(200, 160, 255, 1));
+      }
+      100% {
+        transform: scale(0.75);
+        filter:
+          drop-shadow(0 0 4px rgba(255, 255, 255, 0.7))
+          drop-shadow(0 0 10px rgba(160, 120, 255, 0.8));
+      }
+    }
+
+    /* HP DELTA GÖSTERGESI (yeni) */
+.hp-delta {
+  position: absolute;
+  font-size: 40px;
+  font-weight: bold;
+  color: #fff;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+  animation: hpPulse 0.2s ease;
+}
+
+.hp-delta.plus {
+  text-shadow: 0 0 2px #0f0, 0 0 4px #0f0;
+}
+
+.hp-delta.minus {
+  text-shadow: 0 0 2px #f00, 0 0 4px #f00;
+}
+
+@keyframes hpPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+    .hp-delta.show {
+      opacity: 1;
+    }
+
+    .hp-delta.delta-plus {
+      -webkit-text-stroke: 2px rgba(90, 255, 140, 0.95);
+    }
+
+    .hp-delta.delta-minus {
+      -webkit-text-stroke: 2px rgba(255, 80, 80, 0.95);
+    }
+
+    @keyframes hp-delta-pulse {
+      0%   { transform: translateX(-50%) scale(1); }
+      35%  { transform: translateX(-50%) scale(1.18); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    .hp-delta.pulse {
+      animation: hp-delta-pulse 0.18s ease-out;
+    }
+
+	  .popup-1-hitbox {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  background-image: url("Source/Kayo_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-1-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+
+	  .popup-2-hitbox {
+  position: absolute;
+  width: 82px;
+  height: 93px;
+  background-image: url("Source/Empress_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-2-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+
+	  .popup-3-hitbox {
+  position: absolute;
+  width: 85px;
+  height: 80px;
+  background-image: url("Source/Karvich_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-3-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+
+	  .popup-4-hitbox {
+  position: absolute;
+  width: 100px;
+  height: 90px;
+  background-image: url("Source/Master_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-4-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+
+	  .popup-5-hitbox {
+  position: absolute;
+  width: 105px;
+  height: 105px;
+  background-image: url("Source/Flavek_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-5-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+
+	  .popup-q-hitbox {
+  position: absolute;
+  width: 165px;
+  height: 121px;
+  background-image: url("Source/Chests_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-q-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+
+	  .popup-w-hitbox {
+  position: absolute;
+  width: 110px;
+  height: 180px;
+  background-image: url("Source/Erka_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-w-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+
+		.popup-e-hitbox {
+  position: absolute;
+  width: 132px;
+  height: 175px;
+  background-image: url("Source/Doran_ico.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
+  /*background: rgba(255,0,0,0.3);*/ /* tamamen görünmez */
+  z-index: 5;
+  transition: transform 0.1s ease-out;
+}
+
+.popup-e-hitbox:hover {
+      transform: scale(1.08);
+    }
+
+  </style>
+
+
+</head>
+<body>
+
+<div id="container">
+
+  <!-- PLAYER 1 (YELLOW) -->
+  <div class="maxhp-box" style="top: 230px; left: 135px;" data-player="yellow" data-key="yellow_max_hp"
+       data-min="20" data-max="35" data-value="20">20</div>
+
+  <div class="hp-box" style="top: 290px; left: 135px;" data-player="yellow" data-key="yellow_hp"
+       data-min="0" data-max="35" data-value="20">20</div>
+
+  <div class="hp-reset" style="top: 310px; left: 62px;" data-player="yellow"></div>
+
+  <!-- ARMOR: YELLOW -->
+  <div class="armor-socket" style="top: 106px; left: 123px;" data-player="yellow" data-index="1"></div>
+  <div class="armor-socket" style="top: 117px; left: 155px;" data-player="yellow" data-index="2"></div>
+  <div class="armor-socket" style="top: 106px; left: 187px;" data-player="yellow" data-index="3"></div>
+  <div class="armor-socket" style="top: 148px; left: 135px;" data-player="yellow" data-index="4"></div>
+  <div class="armor-socket" style="top: 148px; left: 176px;" data-player="yellow" data-index="5"></div>
+
+  <!-- WEAPON: YELLOW -->
+  <div class="weapon-socket" style="top: 181px; left: 258px;" data-player="yellow" data-index="1"></div>
+  <div class="weapon-socket" style="top: 139px; left: 257px;" data-player="yellow" data-index="2"></div>
+  <div class="weapon-socket" style="top: 114px; left: 257px;" data-player="yellow" data-index="3"></div>
+  <div class="weapon-socket" style="top: 82px; left: 257px;" data-player="yellow" data-index="4"></div>
+  <div class="weapon-socket" style="top: 54px; left: 257px;" data-player="yellow" data-index="5"></div>
+
+  <!-- ATTACK GÖSTERGESI: YELLOW (HP'nin sağında) -->
+  <div class="attack-box" style="top: 282px; left: 234px;" data-player="yellow">+0</div>
+
+  <!-- PLAYER 2 (RED) -->
+  <div class="maxhp-box" style="top: 230px; left: 451px;" data-player="red" data-key="red_max_hp"
+       data-min="20" data-max="35" data-value="20">20</div>
+
+  <div class="hp-box" style="top: 290px; left: 450px;" data-player="red" data-key="red_hp"
+       data-min="0" data-max="35" data-value="20">20</div>
+
+  <div class="hp-reset" style="top: 310px; left: 379px;" data-player="red"></div>
+
+  <div class="armor-socket" style="top: 104px; left: 434px;" data-player="red" data-index="1"></div>
+  <div class="armor-socket" style="top: 113px; left: 467px;" data-player="red" data-index="2"></div>
+  <div class="armor-socket" style="top: 104px; left: 501px;" data-player="red" data-index="3"></div>
+  <div class="armor-socket" style="top: 146px; left: 447px;" data-player="red" data-index="4"></div>
+  <div class="armor-socket" style="top: 146px; left: 488px;" data-player="red" data-index="5"></div>
+
+  <!-- WEAPON: RED -->
+  <div class="weapon-socket" style="top: 177px; left: 580px;" data-player="red" data-index="1"></div>
+  <div class="weapon-socket" style="top: 141px; left: 580px;" data-player="red" data-index="2"></div>
+  <div class="weapon-socket" style="top: 104px; left: 580px;" data-player="red" data-index="3"></div>
+  <div class="weapon-socket" style="top: 68px;  left: 579px;" data-player="red" data-index="4"></div>
+  <div class="weapon-socket" style="top: 31px;  left: 579px;" data-player="red" data-index="5"></div>
+
+  <!-- ATTACK GÖSTERGESI: RED (HP'nin 50px sağı) -->
+  <div class="attack-box" style="top: 282px; left: 548px;" data-player="red">+0</div>
+
+  <!-- PLAYER 3 (GREEN) -->
+  <div class="maxhp-box" style="top: 230px; left: 768px;" data-player="green" data-key="green_max_hp"
+       data-min="20" data-max="35" data-value="20">20</div>
+
+  <div class="hp-box" style="top: 290px; left: 767px;" data-player="green" data-key="green_hp"
+       data-min="0" data-max="35" data-value="20">20</div>
+
+  <div class="hp-reset" style="top: 310px; left: 695px;" data-player="green"></div>
+
+  <div class="armor-socket" style="top: 104px; left: 754px;" data-player="green" data-index="1"></div>
+  <div class="armor-socket" style="top: 114px; left: 787px;" data-player="green" data-index="2"></div>
+  <div class="armor-socket" style="top: 104px; left: 821px;" data-player="green" data-index="3"></div>
+  <div class="armor-socket" style="top: 146px; left: 765px;" data-player="green" data-index="4"></div>
+  <div class="armor-socket" style="top: 146px; left: 809px;" data-player="green" data-index="5"></div>
+
+  <!-- WEAPON: GREEN -->
+  <div class="weapon-socket" style="top: 172px; left: 891px;" data-player="green" data-index="1"></div>
+  <div class="weapon-socket" style="top: 133px; left: 891px;" data-player="green" data-index="2"></div>
+  <div class="weapon-socket" style="top: 105px; left: 891px;" data-player="green" data-index="3"></div>
+  <div class="weapon-socket" style="top: 76px;  left: 891px;" data-player="green" data-index="4"></div>
+  <div class="weapon-socket" style="top: 48px;  left: 891px;" data-player="green" data-index="5"></div>
+
+  <!-- ATTACK GÖSTERGESI: GREEN (HP'nin 50px sağı) -->
+  <div class="attack-box" style="top: 282px; left: 866px;" data-player="green">+0</div>
+
+  <!-- PLAYER 4 (BLUE) -->
+  <div class="maxhp-box" style="top: 230px; left: 1089px;" data-player="blue" data-key="blue_max_hp"
+       data-min="20" data-max="35" data-value="20">20</div>
+
+  <div class="hp-box" style="top: 290px; left: 1088px;" data-player="blue" data-key="blue_hp"
+       data-min="0" data-max="35" data-value="20">20</div>
+
+  <div class="hp-reset" style="top: 310px; left: 1016px;" data-player="blue"></div>
+
+  <div class="armor-socket" style="top: 105px; left: 1073px;" data-player="blue" data-index="1"></div>
+  <div class="armor-socket" style="top: 115px; left: 1105px;" data-player="blue" data-index="2"></div>
+  <div class="armor-socket" style="top: 105px; left: 1138px;" data-player="blue" data-index="3"></div>
+  <div class="armor-socket" style="top: 145px; left: 1083px;" data-player="blue" data-index="4"></div>
+  <div class="armor-socket" style="top: 145px; left: 1128px;" data-player="blue" data-index="5"></div>
+
+  <!-- WEAPON: BLUE -->
+  <div class="weapon-socket" style="top: 179px; left: 1214px;" data-player="blue" data-index="1"></div>
+  <div class="weapon-socket" style="top: 132px; left: 1215px;" data-player="blue" data-index="2"></div>
+  <div class="weapon-socket" style="top: 100px; left: 1215px;" data-player="blue" data-index="3"></div>
+  <div class="weapon-socket" style="top: 70px;  left: 1215px;" data-player="blue" data-index="4"></div>
+  <div class="weapon-socket" style="top: 38px;  left: 1215px;" data-player="blue" data-index="5"></div>
+
+  <!-- ATTACK GÖSTERGESI: BLUE (HP'nin 50px sağı) -->
+  <div class="attack-box" style="top: 282px; left: 1187px;" data-player="blue">+0</div>
+
+  <!-- ITEM BOXES: YELLOW -->
+  <div class="item-box" style="top: 12px; left: 27px;" data-player="yellow" data-item="gold" data-key="yellow_gold"
+       data-min="0" data-max="99">0</div>
+  <div class="item-box" style="top: 75px; left: 27px;" data-player="yellow" data-item="potion" data-key="yellow_potion"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 137px; left: 27px;" data-player="yellow" data-item="rune" data-key="yellow_rune"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 197px; left: 27px;" data-player="yellow" data-item="key" data-key="yellow_key"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 259px; left: 27px;" data-player="yellow" data-item="arena_score"
+       data-key="yellow_arena_score" data-min="0" data-max="99">0</div>
+
+  <!-- ITEM BOXES: RED -->
+  <div class="item-box" style="top: 12px; left: 347px;" data-player="red" data-item="gold" data-key="red_gold"
+       data-min="0" data-max="99">0</div>
+  <div class="item-box" style="top: 75px; left: 347px;" data-player="red" data-item="potion" data-key="red_potion"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 137px; left: 347px;" data-player="red" data-item="rune" data-key="red_rune"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 197px; left: 347px;" data-player="red" data-item="key" data-key="red_key"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 259px; left: 347px;" data-player="red" data-item="arena_score"
+       data-key="red_arena_score" data-min="0" data-max="99">0</div>
+
+  <!-- ITEM BOXES: GREEN -->
+  <div class="item-box" style="top: 12px; left: 666px;" data-player="green" data-item="gold" data-key="green_gold"
+       data-min="0" data-max="99">0</div>
+  <div class="item-box" style="top: 75px; left: 666px;" data-player="green" data-item="potion"
+       data-key="green_potion" data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 137px; left: 666px;" data-player="green" data-item="rune" data-key="green_rune"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 197px; left: 666px;" data-player="green" data-item="key" data-key="green_key"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 259px; left: 666px;" data-player="green" data-item="arena_score"
+       data-key="green_arena_score" data-min="0" data-max="99">0</div>
+
+  <!-- ITEM BOXES: BLUE -->
+  <div class="item-box" style="top: 12px; left: 984px;" data-player="blue" data-item="gold" data-key="blue_gold"
+       data-min="0" data-max="99">0</div>
+  <div class="item-box" style="top: 75px; left: 984px;" data-player="blue" data-item="potion" data-key="blue_potion"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 137px; left: 984px;" data-player="blue" data-item="rune" data-key="blue_rune"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 197px; left: 984px;" data-player="blue" data-item="key" data-key="blue_key"
+       data-min="0" data-max="4">0</div>
+  <div class="item-box" style="top: 259px; left: 984px;" data-player="blue" data-item="arena_score"
+       data-key="blue_arena_score" data-min="0" data-max="99">0</div>
+
+  <!-- BOSS HP BOXES -->
+  <div class="boss-hp-box" style="top: 372px; left: 452px;" data-boss="kayolith"
+       data-key="boss_kayolith_hp" data-min="0" data-max="99" data-value="40">40</div>
+
+  <div class="boss-hp-box" style="top: 491px; left: 452px;" data-boss="empress"
+       data-key="boss_empress_hp" data-min="0" data-max="99" data-value="44">44</div>
+
+  <div class="boss-hp-box" style="top: 615px; left: 452px;" data-boss="karvich"
+       data-key="boss_karvich_hp" data-min="0" data-max="99" data-value="40">40</div>
+
+  <div class="boss-hp-box" style="top: 400px; left: 777px;" data-boss="master"
+       data-key="boss_master_hp" data-min="0" data-max="99" data-value="42">42</div>
+
+  <div class="boss-hp-box" style="top: 580px; left: 777px;" data-boss="flavek"
+       data-key="boss_flavek_hp" data-min="0" data-max="99" data-value="75">75</div>
+
+  <!-- BOSS RESET BUTONLARI -->
+  <div class="boss-reset" style="top: 441px; left: 324px;" data-boss="kayolith"></div>
+  <div class="boss-reset" style="top: 568px; left: 324px;" data-boss="empress"></div>
+  <div class="boss-reset" style="top: 679px; left: 324px;" data-boss="karvich"></div>
+  <div class="boss-reset" style="top: 490px; left: 643px;" data-boss="master"></div>
+  <div class="boss-reset" style="top: 680px; left: 643px;" data-boss="flavek"></div>
+
+  <!-- MASTER RITUAL BUTONU -->
+  <div class="master-ritual"
+       style="top: 370px; left: 654px;"
+       data-stage="0"></div>
+
+  <!-- OBERON (PET) HP BOX -->
+  <div class="pet-hp-box"
+       style="top: 644px; left: 93px; z-index:9999;"
+       data-pet="oberon"
+       data-key="pet_oberon_hp"
+       data-min="0" data-max="15"
+       data-value="15">15</div>
+
+  <!-- OBERON RESET -->
+  <div class="pet-reset" style="top: 659px; left: 15px;" data-pet="oberon"></div>
+
+  <!-- DRAGGABLE PNGLER -->
+  <img
+    src="Source/EmpressSlug.png"
+    class="drag-icon"
+    data-drag-key="empress_slug_pos"
+    style="top: 491px; left: 377px;"
+    alt="Empress Slug"
+  >
+
+  <img
+    src="Source/KayolithMask.png"
+    class="drag-icon"
+    data-drag-key="kayolith_mask_pos"
+    style="top: 50px; left: 60px;"
+    alt="Kayolith Mask"
+  >
+
+  <img
+    src="Source/KarvichGlass.png"
+    class="drag-icon"
+    data-drag-key="karvich_glass_pos"
+    style="top: 615px; left: 377px;"
+    alt="Karvich Glass"
+  >
+
+  <img
+    src="Source/MasterTorch.png"
+    class="drag-icon"
+    data-drag-key="master_torch_pos"
+    style="top: 400px; left: 702px;"
+    alt="Master Torch"
+  >
+
+<!-- POPUP CLICK HITBOX'LAR -->
+<div class="popup-1-hitbox" data-popup-key="1" style="top:370px; left:350px;"></div>
+<div class="popup-2-hitbox" data-popup-key="2" style="top:490px; left:350px;"></div>
+<div class="popup-3-hitbox" data-popup-key="3" style="top:620px; left:350px;"></div>
+<div class="popup-4-hitbox" data-popup-key="4" style="top:405px; left:665px;"></div>
+<div class="popup-5-hitbox" data-popup-key="5" style="top:575px; left:655px;"></div>
+
+<div class="popup-q-hitbox" data-popup-key="q" style="top:375px; left:970px;"></div>
+<div class="popup-w-hitbox" data-popup-key="w" style="top:513px; left:980px;"></div>
+<div class="popup-e-hitbox" data-popup-key="e" style="top:523px; left:1130px;"></div>
+</div>
+
+<!-- POPUP KART DIVLERI (1-5 TUŞLARI) -->
+<div class="card-popup" id="popup-1">
+  <img src="Source/Kayolith_Card_TR.jpg" alt="Kayolith Card">
+</div>
+
+<div class="card-popup" id="popup-2">
+  <img src="Source/Empress_Card_TR.jpg" alt="Empress Card">
+</div>
+
+<div class="card-popup" id="popup-3">
+  <img src="Source/KontKarvich_Card_TR.jpg" alt="Kont Karvich Card">
+</div>
+
+<div class="card-popup" id="popup-4">
+  <img src="Source/Master_Card_TR.jpg" alt="Master Card">
+</div>
+
+<div class="card-popup" id="popup-5">
+  <img src="Source/0_FLAVEK_CARD_TR.jpg" alt="Flavek Card">
+</div>
+
+<!-- YENI POPUPLAR: Q, W, E -->
+<div class="card-popup" id="popup-q">
+  <img src="Source/CHEST_DROPS_TR.jpg" alt="Chest Drops">
+</div>
+
+<div class="card-popup" id="popup-w">
+  <img src="Source/ERKA_TR.jpg" alt="Erka Card">
+</div>
+
+<div class="card-popup" id="popup-e">
+  <img src="Source/DORAN_TR.jpg" alt="Doran Card">
+</div>
+
+
+
+
+<script>
+  document.addEventListener("contextmenu", e => e.preventDefault());
+
+  const STORAGE_PREFIX = "dunmuc_";
+  const MASTER_RITUAL_KEY = STORAGE_PREFIX + "master_ritual_stage";
+
+  const BOSS_DEFAULT_HP = {
+    kayolith: 40,
+    empress: 44,
+    karvich: 40,
+    master: 42,
+    flavek: 75
+  };
+
+  /* SESLER */
+  const sounds = {
+    goldGain:  new Audio("Source/Gold_Gain.mp3"),
+    goldUsed:  new Audio("Source/Gold_Used.mp3"),
+    hpReset:   new Audio("Source/HP_Reset.mp3"),
+    itemUpgrade: new Audio("Source/Item_Upgrade.mp3"),
+    itemUpgrade5th: new Audio("Source/Item_Upgrade5th.mp3"),
+    masterRitual: new Audio("Source/Master_Rituel_CheckPoint.mp3"),
+    potionGain: new Audio("Source/Potion_Gain.mp3"),
+    potionUsed: new Audio("Source/Potion_Used.mp3"),
+    runeGain:   new Audio("Source/Rune_Gain.mp3"),
+    runeUsed:   new Audio("Source/Rune_Used.mp3"),
+    unitDeath:  new Audio("Source/Unit_Death.mp3"),
+    killGain:  new Audio("Source/Kill_Gain.mp3")
+  };
+
+  // HP loss ses dosya yolları, her tetiklemede yeni Audio oluşturacağız
+  const hpLossFiles = [
+    "Source/HPLoss_1.mp3",
+    "Source/HPLoss_2.mp3",
+    "Source/HPLoss_3.mp3",
+    "Source/HPLoss_4.mp3"
+  ];
+  let lastHpLossTime = 0;
+
+  function playSound(audio) {
+    if (!audio) return;
+    try {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    } catch (err) {}
+  }
+
+  function playRandomHpLoss() {
+    const now = Date.now();
+    if (now - lastHpLossTime < 1000) return;
+    lastHpLossTime = now;
+
+    const file = hpLossFiles[Math.floor(Math.random() * hpLossFiles.length)];
+    try {
+      const audio = new Audio(file);
+      audio.play().catch(() => {});
+    } catch (err) {}
+  }
+
+  function safeParseInt(val, fallback) {
+    const n = parseInt(val);
+    return Number.isNaN(n) ? fallback : n;
+  }
+
+  function addTempClass(el, className, duration) {
+    if (!el) return;
+    el.classList.remove(className);
+    void el.offsetWidth;
+    el.classList.add(className);
+    setTimeout(() => {
+      el.classList.remove(className);
+    }, duration);
+  }
+
+  function addBump(el) {
+    addTempClass(el, "bump", 180);
+  }
+
+  /* HP DELTA (yeni) */
+ const hpDeltaState = {};
+
+function showHpDeltaFixed(box, delta) {
+  const key = box.dataset.key;
+  const container = document.getElementById("container");
+
+  if (!hpDeltaState[key]) {
+    const rect = box.getBoundingClientRect();
+    const contRect = container.getBoundingClientRect();
+
+    const el = document.createElement("div");
+    el.className = "hp-delta";
+    el.style.left = (rect.left - contRect.left + rect.width + 10) + "px";
+    el.style.top  = (rect.top  - contRect.top) + "px";
+
+    container.appendChild(el);
+
+    hpDeltaState[key] = {
+      el,
+      value: 0,
+      timer: null
+    };
+  }
+
+  const state = hpDeltaState[key];
+  state.value += delta;
+
+  state.el.textContent = (state.value > 0 ? "+" : "") + state.value;
+  state.el.classList.remove("plus", "minus");
+  state.el.classList.add(state.value > 0 ? "plus" : "minus");
+
+  // pulse reset
+  state.el.style.animation = "none";
+  state.el.offsetHeight;
+  state.el.style.animation = "";
+
+  clearTimeout(state.timer);
+  state.timer = setTimeout(() => {
+    state.el.style.opacity = "0";
+    setTimeout(() => {
+      state.el.remove();
+      delete hpDeltaState[key];
+    }, 600);
+  }, 3000);
+}
+
+
+  function loadInitialValues() {
+    const boxes = document.querySelectorAll(
+      ".hp-box, .maxhp-box, .item-box, .boss-hp-box, .pet-hp-box"
+    );
+
+    boxes.forEach((box, index) => {
+      const key = box.dataset.key || ("box_" + index);
+      box.dataset.key = key;
+
+      const defaultVal = safeParseInt(
+        box.getAttribute("data-value") ?? box.textContent.trim(),
+        0
+      );
+
+      const storedRaw = localStorage.getItem(STORAGE_PREFIX + key);
+      const value = storedRaw == null
+        ? defaultVal
+        : safeParseInt(storedRaw, defaultVal);
+
+      box.dataset.value = value;
+      box.textContent = value;
+      localStorage.setItem(STORAGE_PREFIX + key, value);
+    });
+  }
+
+  function getMaxHpBoxForPlayer(playerId) {
+    return document.querySelector('.maxhp-box[data-player="' + playerId + '"]');
+  }
+
+  function getHpBoxForPlayer(playerId) {
+    return document.querySelector('.hp-box[data-player="' + playerId + '"]');
+  }
+
+  function clampHpToMax(box) {
+    if (!box) return;
+    const playerId = box.dataset.player;
+    const maxBox = getMaxHpBoxForPlayer(playerId);
+    const maxVal = maxBox ? safeParseInt(maxBox.dataset.value, 20) : 20;
+
+    let cur = safeParseInt(box.dataset.value, 0);
+    if (cur > maxVal) {
+      cur = maxVal;
+      box.dataset.value = cur;
+      box.textContent = cur;
+      localStorage.setItem(STORAGE_PREFIX + box.dataset.key, cur);
+    }
+  }
+
+  function updateHpDangerState(box) {
+    if (!box) return;
+    const v = safeParseInt(box.dataset.value, 0);
+    if (v > 0 && v <= 5) {
+      box.classList.add("hp-danger");
+    } else {
+      box.classList.remove("hp-danger");
+    }
+  }
+
+  function updateBossDangerState(box) {
+    if (!box) return;
+    const v = safeParseInt(box.dataset.value, 0);
+    const min = safeParseInt(box.dataset.min, 0);
+    if (v > min && v <= 5) {
+      box.classList.add("hp-danger");
+    } else {
+      box.classList.remove("hp-danger");
+    }
+  }
+
+  function setupPlayerHp() {
+    document.querySelectorAll(".hp-box").forEach(box => {
+      clampHpToMax(box);
+      updateHpDangerState(box);
+
+      box.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        let oldV = safeParseInt(this.dataset.value, 0);
+        let v = oldV;
+        const min = safeParseInt(this.dataset.min, 0);
+
+        const maxBox = getMaxHpBoxForPlayer(this.dataset.player);
+        const maxHp = maxBox ? safeParseInt(maxBox.dataset.value, 20) : 20;
+
+        if (e.button === 0) {
+          v = Math.min(maxHp, v + 1);
+        } else if (e.button === 2) {
+          const step = (e.ctrlKey || e.shiftKey) ? 5 : 1;
+          v = Math.max(min, v - step);
+        } else {
+          return;
+        }
+
+        if (v < oldV) {
+          playRandomHpLoss();
+          if (v === 0 && oldV > 0) {
+            playSound(sounds.unitDeath);
+          }
+        }
+
+        this.dataset.value = v;
+        this.textContent = v;
+        localStorage.setItem(STORAGE_PREFIX + this.dataset.key, v);
+
+        const delta = v - oldV;
+        if (delta !== 0) {
+          showHpDeltaFixed(this, delta);
+        }
+
+        updateHpDangerState(this);
+        addBump(this);
+      });
+    });
+  }
+
+  /* ARMOR LOGIC */
+  function armorLevelKey(p) {
+    return STORAGE_PREFIX + p + "_armor_level";
+  }
+
+  function getArmorLevel(p) {
+    return Math.max(0, Math.min(5, safeParseInt(localStorage.getItem(armorLevelKey(p)), 0)));
+  }
+
+  function getArmorStoneImg(playerId) {
+    return {
+      yellow: "url('Source/P1_Armor_Check.png')",
+      red: "url('Source/P2_Armor_Check.png')",
+      green: "url('Source/P3_Armor_Check.png')",
+      blue: "url('Source/P4_Armor_Check.png')",
+    }[playerId];
+  }
+
+  function updateArmor(playerId, level) {
+    level = Math.max(0, Math.min(5, level));
+
+    const sockets = document.querySelectorAll(`.armor-socket[data-player="${playerId}"]`);
+    const img = getArmorStoneImg(playerId);
+
+    sockets.forEach(s => {
+      s.classList.remove("armor-flame");
+    });
+
+    sockets.forEach(s => {
+      const id = safeParseInt(s.dataset.index, 0);
+
+      if (id <= level) {
+        s.style.backgroundImage = img;
+        s.style.backgroundSize = "cover";
+        s.style.backgroundPosition = "center";
+        s.style.backgroundRepeat = "no-repeat";
+      } else {
+        s.style.backgroundImage = "none";
+      }
+    });
+
+    if (level === 5) {
+      sockets.forEach(s => s.classList.add("armor-flame"));
+    }
+
+    const maxBox = getMaxHpBoxForPlayer(playerId);
+    if (maxBox) {
+      const newMax = Math.min(20 + level * 3, 35);
+      maxBox.dataset.value = newMax;
+      maxBox.textContent = newMax;
+      localStorage.setItem(STORAGE_PREFIX + maxBox.dataset.key, newMax);
+      addBump(maxBox);
+    }
+
+    const hpBox = getHpBoxForPlayer(playerId);
+    if (hpBox) {
+      clampHpToMax(hpBox);
+      updateHpDangerState(hpBox);
+    }
+
+    localStorage.setItem(armorLevelKey(playerId), level);
+  }
+
+  function setupArmorSockets() {
+    document.querySelectorAll(".armor-socket").forEach(s => {
+      s.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        const player = this.dataset.player;
+        let lvl = getArmorLevel(player);
+        let oldLvl = lvl;
+
+        if (e.button === 0 && lvl < 5) {
+          lvl++;
+          if (lvl > oldLvl) {
+            if (lvl === 5) {
+              playSound(sounds.itemUpgrade5th);
+            } else {
+              playSound(sounds.itemUpgrade);
+            }
+          }
+        } else if (e.button === 2 && lvl > 0) {
+          lvl--;
+        } else {
+          return;
+        }
+
+        updateArmor(player, lvl);
+      });
+    });
+  }
+
+  /* WEAPON (SWORD) LOGIC */
+  function swordLevelKey(p) {
+    return STORAGE_PREFIX + p + "_sword_level";
+  }
+
+  function getSwordLevel(p) {
+    return Math.max(0, Math.min(5, safeParseInt(localStorage.getItem(swordLevelKey(p)), 0)));
+  }
+
+  function getSwordStoneImg(playerId) {
+    return {
+      yellow: "url('Source/P1_Sword_Check.png')",
+      red: "url('Source/P2_Sword_Check.png')",
+      green: "url('Source/P3_Sword_Check.png')",
+      blue: "url('Source/P4_Sword_Check.png')",
+    }[playerId];
+  }
+
+  function attackValueFromLevel(level) {
+    if (level >= 5) return 6;
+    return level;
+  }
+
+  function updateAttackDisplay(playerId, level) {
+    const box = document.querySelector('.attack-box[data-player="' + playerId + '"]');
+    if (!box) return;
+    const atk = attackValueFromLevel(level);
+    box.textContent = "+" + atk;
+
+    box.classList.remove("attack-max");
+    if (atk >= 6) {
+      box.classList.add("attack-max");
+    }
+  }
+
+  function updateSword(playerId, level) {
+    level = Math.max(0, Math.min(5, level));
+
+    const sockets = document.querySelectorAll(`.weapon-socket[data-player="${playerId}"]`);
+    const img = getSwordStoneImg(playerId);
+
+    sockets.forEach(s => {
+      s.classList.remove("weapon-flame");
+      s.style.filter = "none";
+    });
+
+    sockets.forEach(s => {
+      const id = safeParseInt(s.dataset.index, 0);
+
+      if (id <= level) {
+        s.style.backgroundImage = img;
+        s.style.backgroundSize = "cover";
+        s.style.backgroundPosition = "center";
+        s.style.backgroundRepeat = "no-repeat";
+      } else {
+        s.style.backgroundImage = "none";
+      }
+    });
+
+    if (level === 5) {
+      sockets.forEach(s => s.classList.add("weapon-flame"));
+    }
+
+    localStorage.setItem(swordLevelKey(playerId), level);
+    updateAttackDisplay(playerId, level);
+  }
+
+  function setupWeaponSockets() {
+    document.querySelectorAll(".weapon-socket").forEach(s => {
+      s.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        const player = this.dataset.player;
+        let lvl = getSwordLevel(player);
+        let oldLvl = lvl;
+
+        if (e.button === 0 && lvl < 5) {
+          lvl++;
+          if (lvl > oldLvl) {
+            if (lvl === 5) {
+              playSound(sounds.itemUpgrade5th);
+            } else {
+              playSound(sounds.itemUpgrade);
+            }
+          }
+        } else if (e.button === 2 && lvl > 0) {
+          lvl--;
+        } else {
+          return;
+        }
+
+        updateSword(player, lvl);
+      });
+    });
+
+    ["yellow","red","green","blue"].forEach(p => {
+      updateAttackDisplay(p, getSwordLevel(p));
+    });
+  }
+
+  function updateItemAura(box, value) {
+    const type = box.dataset.item;
+    box.classList.remove("gold-aura", "potion-aura", "rune-aura", "key-aura");
+
+    if (type === "gold" && value >= 5) {
+      box.classList.add("gold-aura");
+    } else if (type === "potion" && value >= 4) {
+      box.classList.add("potion-aura");
+    } else if (type === "rune" && value >= 4) {
+      box.classList.add("rune-aura");
+    } else if (type === "key" && value >= 4) {
+      box.classList.add("key-aura");
+    }
+  }
+
+  function setupItems() {
+    document.querySelectorAll(".item-box").forEach(box => {
+      const initialVal = safeParseInt(box.dataset.value, 0);
+      updateItemAura(box, initialVal);
+
+      box.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+
+        let oldV = safeParseInt(this.dataset.value, 0);
+        let v = oldV;
+        const min = safeParseInt(this.dataset.min, 0);
+        const max = safeParseInt(this.dataset.max, 0);
+        const type = this.dataset.item;
+        const playerId = this.dataset.player;
+
+        if (e.button === 0) {
+          if (v < max) v = v + 1;
+
+          if (v > oldV) {
+            if (type === "gold" || type === "key") {
+              playSound(sounds.goldGain);
+            } else if (type === "potion") {
+              playSound(sounds.potionGain);
+            } else if (type === "rune") {
+              playSound(sounds.runeGain);
+            } else if (type === "arena_score") {
+              playSound(sounds.killGain);
+            }
+          }
+
+        } else if (e.button === 2) {
+          if (type === "potion") {
+            if (v > 0) {
+              const stolen = e.ctrlKey || e.shiftKey;
+              v--;
+
+              playSound(sounds.potionUsed);
+
+              if (!stolen) {
+                const hpBox = getHpBoxForPlayer(playerId);
+                const maxBox = getMaxHpBoxForPlayer(playerId);
+                if (hpBox && maxBox) {
+                  let hp = safeParseInt(hpBox.dataset.value, 0);
+                  const maxHp = safeParseInt(maxBox.dataset.value, 20);
+                  const missing = maxHp - hp;
+
+                  if (missing > 0) {
+                    const heal = Math.min(5, missing);
+                    hp += heal;
+
+                    hpBox.dataset.value = hp;
+                    hpBox.textContent = hp;
+                    localStorage.setItem(STORAGE_PREFIX + hpBox.dataset.key, hp);
+
+                    updateHpDangerState(hpBox);
+                    addBump(hpBox);
+                  }
+                }
+              }
+            }
+          } else {
+            v = Math.max(min, v - 1);
+
+            if (v < oldV) {
+              if (type === "gold" || type === "key") {
+                playSound(sounds.goldUsed);
+              } else if (type === "rune") {
+                playSound(sounds.runeUsed);
+              }
+            }
+          }
+        } else {
+          return;
+        }
+
+        this.dataset.value = v;
+        this.textContent = v;
+        localStorage.setItem(STORAGE_PREFIX + this.dataset.key, v);
+
+        updateItemAura(this, v);
+        addBump(this);
+      });
+    });
+  }
+
+  function renderBossDisplay(box, value) {
+    const min = safeParseInt(box.dataset.min, 0);
+    box.dataset.value = value;
+
+    if (value <= min) {
+      box.textContent = "DEAD";
+      box.classList.add("boss-dead");
+      box.classList.remove("hp-danger");
+    } else {
+      box.textContent = value;
+      box.classList.remove("boss-dead");
+      updateBossDangerState(box);
+    }
+  }
+
+  function setupBosses() {
+    document.querySelectorAll(".boss-hp-box").forEach(box => {
+      let v = safeParseInt(box.dataset.value, 0);
+      renderBossDisplay(box, v);
+
+      box.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        let oldVal = safeParseInt(this.dataset.value, 0);
+        let val = oldVal;
+        const min = safeParseInt(this.dataset.min, 0);
+        const max = safeParseInt(this.dataset.max, 99);
+
+        if (e.button === 0) {
+          val = Math.min(max, val + 1);
+        } else if (e.button === 2) {
+          const step = (e.ctrlKey || e.shiftKey) ? 5 : 1;
+          val = Math.max(min, val - step);
+        } else {
+          return;
+        }
+
+        if (val < oldVal) {
+          playRandomHpLoss();
+          if (val === 0 && oldVal > 0) {
+            playSound(sounds.unitDeath);
+          }
+        }
+
+        localStorage.setItem(STORAGE_PREFIX + this.dataset.key, val);
+        renderBossDisplay(this, val);
+
+        const delta = val - oldVal;
+        if (delta !== 0) {
+          showHpDeltaFixed(this, delta);
+        }
+
+        addBump(this);
+      });
+    });
+  }
+
+  function resetBossHp(bossId) {
+    const box = document.querySelector('.boss-hp-box[data-boss="' + bossId + '"]');
+    if (!box) return;
+
+    const min = safeParseInt(box.dataset.min, 0);
+    const defVal = BOSS_DEFAULT_HP[bossId] != null ? BOSS_DEFAULT_HP[bossId] : min;
+
+    localStorage.setItem(STORAGE_PREFIX + box.dataset.key, defVal);
+    renderBossDisplay(box, defVal);
+    addBump(box);
+  }
+
+  function setupBossResetButtons() {
+    document.querySelectorAll(".boss-reset").forEach(btn => {
+      btn.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        if (e.button !== 0) return;
+        const bossId = this.dataset.boss;
+        resetBossHp(bossId);
+      });
+    });
+  }
+
+  function renderPetDisplay(box, value) {
+    const min = safeParseInt(box.dataset.min, 0);
+    const max = safeParseInt(box.dataset.max, 20);
+    let v = value;
+
+    if (v <= min) {
+      box.dataset.value = min;
+      box.textContent = "DEAD";
+      box.classList.add("pet-dead");
+    } else {
+      if (v > max) v = max;
+      box.dataset.value = v;
+      box.textContent = v;
+      box.classList.remove("pet-dead");
+    }
+
+    updateHpDangerState(box);
+  }
+
+  function setupPets() {
+    document.querySelectorAll(".pet-hp-box").forEach(box => {
+      let v = safeParseInt(box.dataset.value, 20);
+      const min = safeParseInt(box.dataset.min, 0);
+      const max = safeParseInt(box.dataset.max, 20);
+
+      if (v < min) v = min;
+      if (v > max) v = max;
+
+      renderPetDisplay(box, v);
+
+      box.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        let oldVal = safeParseInt(this.dataset.value, 0);
+        let val = oldVal;
+        const minVal = safeParseInt(this.dataset.min, 0);
+        const maxVal = safeParseInt(this.dataset.max, 20);
+
+        if (e.button === 0) {
+          val = Math.min(maxVal, val + 1);
+        } else if (e.button === 2) {
+          const step = (e.ctrlKey || e.shiftKey) ? 5 : 1;
+          val = Math.max(minVal, val - step);
+        } else {
+          return;
+        }
+
+        if (val < oldVal) {
+          playRandomHpLoss();
+          if (val === 0 && oldVal > 0) {
+            playSound(sounds.unitDeath);
+          }
+        }
+
+        localStorage.setItem(STORAGE_PREFIX + this.dataset.key, val);
+        renderPetDisplay(this, val);
+        addBump(this);
+      });
+    });
+  }
+
+  function resetPetHp(petId) {
+    const box = document.querySelector('.pet-hp-box[data-pet="' + petId + '"]');
+    if (!box) return;
+
+    const maxVal = safeParseInt(box.dataset.max, 20);
+    const defVal = maxVal;
+
+    localStorage.setItem(STORAGE_PREFIX + box.dataset.key, defVal);
+    renderPetDisplay(box, defVal);
+    addBump(box);
+  }
+
+  function setupPetResetButtons() {
+    document.querySelectorAll(".pet-reset").forEach(btn => {
+      btn.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        if (e.button !== 0) return;
+        const petId = this.dataset.pet;
+        resetPetHp(petId);
+      });
+    });
+  }
+
+  function healPlayerToFull(playerId) {
+    const hpBox = getHpBoxForPlayer(playerId);
+    const maxBox = getMaxHpBoxForPlayer(playerId);
+    if (!hpBox || !maxBox) return;
+
+    const maxHp = safeParseInt(maxBox.dataset.value, 20);
+    let hp = safeParseInt(hpBox.dataset.value, 0);
+
+    if (hp >= maxHp) return;
+
+    hp = maxHp;
+    hpBox.dataset.value = hp;
+    hpBox.textContent = hp;
+    localStorage.setItem(STORAGE_PREFIX + hpBox.dataset.key, hp);
+
+    updateHpDangerState(hpBox);
+    addBump(hpBox);
+  }
+
+  function setupHpResetButtons() {
+    document.querySelectorAll(".hp-reset").forEach(btn => {
+      btn.addEventListener("mousedown", function(e) {
+        e.preventDefault();
+        if (e.button !== 0) return;
+        const playerId = this.dataset.player;
+        playSound(sounds.hpReset);
+        healPlayerToFull(playerId);
+      });
+    });
+  }
+
+  /* MASTER RITUAL LOGIC */
+  function getMasterRitualStage() {
+    return Math.max(0, Math.min(4, safeParseInt(localStorage.getItem(MASTER_RITUAL_KEY), 0)));
+  }
+
+  function renderMasterRitual(stage) {
+    const el = document.querySelector(".master-ritual");
+    if (!el) return;
+
+    el.dataset.stage = stage;
+    el.classList.remove("master-ritual-skull");
+    el.textContent = "";
+
+    if (stage === 0) {
+      el.textContent = "";
+    } else if (stage >= 1 && stage <= 3) {
+      el.textContent = String(stage);
+    } else if (stage === 4) {
+      el.textContent = "☠";
+      el.classList.add("master-ritual-skull");
+    }
+
+    localStorage.setItem(MASTER_RITUAL_KEY, stage);
+  }
+
+  function setupMasterRitual() {
+    const el = document.querySelector(".master-ritual");
+    if (!el) return;
+
+    const current = getMasterRitualStage();
+    renderMasterRitual(current);
+
+    el.addEventListener("mousedown", function(e) {
+      e.preventDefault();
+
+      let st = safeParseInt(this.dataset.stage, getMasterRitualStage());
+
+      if (e.button === 0) {
+        st = (st + 1) % 5;
+        playSound(sounds.masterRitual);
+      } else if (e.button === 2) {
+        st = st - 1;
+        if (st < 0) st = 4;
+      } else {
+        return;
+      }
+
+      renderMasterRitual(st);
+      addBump(this);
+    });
+  }
+
+  /* DRAGGABLE ICON LOGIC */
+  const dragState = {
+    active: false,
+    target: null,
+    offsetX: 0,
+    offsetY: 0,
+    contLeft: 0,
+    contTop: 0
+  };
+
+  function setupDragIcons() {
+    const container = document.getElementById("container");
+    if (!container) return;
+
+    const icons = document.querySelectorAll(".drag-icon");
+    icons.forEach(icon => {
+      const key = icon.dataset.dragKey;
+      if (key) {
+        const stored = localStorage.getItem(STORAGE_PREFIX + key);
+        if (stored) {
+          try {
+            const pos = JSON.parse(stored);
+            if (typeof pos.left === "number" && typeof pos.top === "number") {
+              icon.style.left = pos.left + "px";
+              icon.style.top = pos.top + "px";
+            }
+          } catch (err) {}
+        }
+      }
+
+      icon.addEventListener("mousedown", function(e) {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const rect = this.getBoundingClientRect();
+        const contRect = container.getBoundingClientRect();
+
+        dragState.active = true;
+        dragState.target = this;
+        dragState.offsetX = e.clientX - rect.left;
+        dragState.offsetY = e.clientY - rect.top;
+        dragState.contLeft = contRect.left;
+        dragState.contTop = contRect.top;
+
+        this.classList.add("dragging");
+      });
+    });
+
+    document.addEventListener("mousemove", function(e) {
+      if (!dragState.active || !dragState.target) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const el = dragState.target;
+
+      let newLeft = e.clientX - dragState.contLeft - dragState.offsetX;
+      let newTop  = e.clientY - dragState.contTop  - dragState.offsetY;
+
+      const maxLeft = containerRect.width - el.offsetWidth;
+      const maxTop  = containerRect.height - el.offsetHeight;
+
+      if (newLeft < 0) newLeft = 0;
+      if (newTop < 0) newTop = 0;
+      if (newLeft > maxLeft) newLeft = maxLeft;
+      if (newTop > maxTop) newTop = maxTop;
+
+      el.style.left = newLeft + "px";
+      el.style.top  = newTop + "px";
+    });
+
+    document.addEventListener("mouseup", function() {
+      if (dragState.active && dragState.target) {
+        const el = dragState.target;
+        el.classList.remove("dragging");
+
+        const key = el.dataset.dragKey;
+        if (key) {
+          const left = parseFloat(el.style.left) || 0;
+          const top  = parseFloat(el.style.top) || 0;
+          const pos = { left, top };
+          try {
+            localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(pos));
+          } catch (err) {}
+        }
+      }
+      dragState.active = false;
+      dragState.target = null;
+    });
+  }
+
+  /* POPUP KART LOGIC (1-5 ve Q W E TUŞLARI) */
+  const popupMap = {
+    "1": document.getElementById("popup-1"),
+    "2": document.getElementById("popup-2"),
+    "3": document.getElementById("popup-3"),
+    "4": document.getElementById("popup-4"),
+    "5": document.getElementById("popup-5"),
+    "q": document.getElementById("popup-q"),
+    "w": document.getElementById("popup-w"),
+    "e": document.getElementById("popup-e")
+  };
+
+  function togglePopupByKey(key) {
+  const popup = popupMap[key];
+  if (!popup) return;
+
+  const isOpen = popup.style.display === "block";
+  hideAllPopups();
+
+  if (!isOpen) {
+    popup.style.display = "block";
+  }
+}
+
+document.querySelectorAll(".popup-1-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+document.querySelectorAll(".popup-2-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+document.querySelectorAll(".popup-3-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+document.querySelectorAll(".popup-4-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+document.querySelectorAll(".popup-5-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+document.querySelectorAll(".popup-q-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+document.querySelectorAll(".popup-w-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+document.querySelectorAll(".popup-e-hitbox").forEach(box => {
+  box.addEventListener("click", () => {
+    const key = box.dataset.popupKey;
+    togglePopupByKey(key);
+  });
+});
+
+
+
+  function hideAllPopups() {
+    Object.values(popupMap).forEach(p => {
+      if (p) p.style.display = "none";
+    });
+  }
+
+  Object.values(popupMap).forEach(popup => {
+  if (!popup) return;
+
+  popup.addEventListener("click", () => {
+    hideAllPopups();
+  });
+});
+
+  document.addEventListener("keydown", function(e) {
+    if (e.repeat) return;
+
+    const rawKey = e.key;
+    const key = rawKey.toLowerCase();
+
+    if (key === "escape" || rawKey === " " || rawKey === "Spacebar") {
+      hideAllPopups();
+      return;
+    }
+
+    const popup = popupMap[key];
+    if (!popup) return;
+
+    const currentlyVisible = popup.style.display === "block";
+    hideAllPopups();
+    if (!currentlyVisible) {
+      popup.style.display = "block";
+    } else {
+      popup.style.display = "none";
+    }
+  });
+
+
+
+  // INIT
+  loadInitialValues();
+  setupPlayerHp();
+  setupArmorSockets();
+  setupWeaponSockets();
+  setupItems();
+  setupBosses();
+  setupBossResetButtons();
+  setupPets();
+  setupPetResetButtons();
+  setupHpResetButtons();
+  setupMasterRitual();
+  setupDragIcons();
+
+  ["yellow","red","green","blue"].forEach(p => {
+    updateArmor(p, getArmorLevel(p));
+    updateSword(p, getSwordLevel(p));
+  });
+
+
+</script>
+
+
+
+</body>
+</html>
